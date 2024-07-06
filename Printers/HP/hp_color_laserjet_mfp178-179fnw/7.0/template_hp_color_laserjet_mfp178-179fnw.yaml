@@ -1,0 +1,470 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 99e8a9d7b1f9411e9d27264308ec6a93
+      template: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+      name: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+      description: |
+        Cloned and adapted template from Printer HP Color LaserJet CP2025dn to work with HP Color Laser MFP 178/179fnw printer.
+        
+        Changed some SNMP OID's to display the right information (location, cartridge color & type). Triggers still work the same and alerts whenever needed.
+        
+        Raimond Kollman (Xifeo ICT B.V.)
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 8639ff31d2304512b5c7b20a6b60431d
+          name: 'Cartridge toner level % - black'
+          type: CALCULATED
+          key: black.cartridge.toner
+          delay: '360'
+          history: 7d
+          units: '%'
+          params: '100*last(//ink.black.now)/last(//ink.black.max)'
+          tags:
+            - tag: Application
+              value: 'Consumables level %'
+        - uuid: 6f848b40970b450abd706e0c9f220bf0
+          name: 'Cartridge toner level % - cyan'
+          type: CALCULATED
+          key: cyan.cartridge.toner
+          delay: '360'
+          history: 7d
+          units: '%'
+          params: '100*last(//ink.cyan.now)/last(//ink.cyan.max)'
+          tags:
+            - tag: Application
+              value: 'Consumables level %'
+        - uuid: 87b6094dd05349deb7ff27e837c2dcec
+          name: 'Max cartridge toner level - black'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.4
+          key: ink.black.max
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: c2380e874dbf4afabe64115ddfff7254
+          name: 'Current cartridge toner level - black'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.4
+          key: ink.black.now
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: 63c56f51b01d4899978dd83aceaa30f3
+          name: 'Max cartridge toner level - cyan'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.1
+          key: ink.cyan.max
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: e18d09ee5b164b25b21b243cb91e7175
+          name: 'Current cartridge toner level - cyan'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.1
+          key: ink.cyan.now
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: e0544836d9e941358f6261b8e0511f7e
+          name: 'Max cartridge toner level - magenta'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.2
+          key: ink.magenta.max
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: 8c9e0471b6484f6ebc43670df2c6ca9c
+          name: 'Current cartridge toner level - magenta'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.2
+          key: ink.magenta.now
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: c937f159734247b48400e8dd001ceaee
+          name: 'Max cartridge toner level - yellow'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.3
+          key: ink.yellow.max
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: 238248b596af4a6abd6ef25b1d4ccd3b
+          name: 'Current cartridge toner level - yellow'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.3
+          key: ink.yellow.now
+          delay: '360'
+          history: 7d
+          tags:
+            - tag: Application
+              value: 'Consumables level'
+        - uuid: da9486870d7f44faba21a3502064f0b6
+          name: 'Cartridge toner level % - magenta'
+          type: CALCULATED
+          key: magenta.cartridge.toner
+          delay: '360'
+          history: 7d
+          units: '%'
+          params: '100*last(//ink.magenta.now)/last(//ink.magenta.max)'
+          tags:
+            - tag: Application
+              value: 'Consumables level %'
+        - uuid: fae6659b793e44838444f1987b1a767f
+          name: 'Printer model'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.5.1.1.16.1
+          key: model
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: TYPE
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: c3c3c5941ed04bf782754fec42352f10
+          name: 'Pages printed - total'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.10.2.1.4.1.1
+          key: pages.printed.total
+          delay: '360'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Pages printed'
+        - uuid: c27c8f4d10844d67a76bd03516ba82fc
+          name: 'Printer location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: printer.location
+          delay: '3600'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: LOCATION
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: ef6d58666c274ef19ffb83a766f52c12
+          name: 'Serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.5.1.1.17.1
+          key: serial.number
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: cdecd558649a4431928281044a351029
+          name: 'Cartridge type - Black'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.6.1.4
+          key: type.black
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: ba05b71cf4804eefb8d6c0fa6c968f98
+          name: 'Cartridge type - Cyan'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.6.1.1
+          key: type.cyan
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: 6c561198c855456092e352674a077e8d
+          name: 'Cartridge type - Magenta'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.6.1.2
+          key: type.magenta
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: 67aa0314f0a043d39ac70a883640f87c
+          name: 'Cartridge type - Yellow'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.6.1.3
+          key: type.yellow
+          delay: '43200'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: 'Printer information'
+        - uuid: f7c4bff6136e409a9abb282cd0232bcf
+          name: 'Cartridge toner level % - yellow'
+          type: CALCULATED
+          key: yellow.cartridge.toner
+          delay: '360'
+          history: 7d
+          units: '%'
+          params: '100*last(//ink.yellow.now)/last(//ink.yellow.max)'
+          tags:
+            - tag: Application
+              value: 'Consumables level %'
+      dashboards:
+        - uuid: 0c5ce79ae65e4cbeaa608956fd688339
+          name: 'Toner level'
+          pages:
+            - widgets:
+                - type: graph
+                  width: '18'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+                        name: 'Black toner level'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: graph
+                  x: '18'
+                  width: '18'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+                        name: 'Cyan toner level'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: graph
+                  x: '36'
+                  width: '18'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+                        name: 'Magenta toner level'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: graph
+                  x: '54'
+                  width: '18'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+                        name: 'Yellow toner level'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+  triggers:
+    - uuid: 9e829ad7083a4715812348529b1b26c7
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/black.cartridge.toner)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.cyan,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Empty cartridge toner - black'
+      priority: HIGH
+    - uuid: 0e7123511b6e486a96672e6348da7b2d
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/cyan.cartridge.toner)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.magenta,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Empty cartridge toner - cyan'
+      priority: HIGH
+    - uuid: 0ad8ed7205334f6f91fec5b56364bd1d
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/magenta.cartridge.toner)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.yellow,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Empty cartridge toner - magenta'
+      priority: HIGH
+    - uuid: 0237448cdbc2446395b8060bd492307f
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/yellow.cartridge.toner)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.black,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Empty cartridge toner - yellow'
+      priority: HIGH
+    - uuid: 0e64dafbed1d403fa48bf4a902f60f18
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/black.cartridge.toner)<20
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.cyan,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Low cartridge toner - black'
+      priority: INFO
+      dependencies:
+        - name: 'Empty cartridge toner - black'
+          expression: |
+            last(/Printer HP Color LaserJet MFP 178 or 179fnw/black.cartridge.toner)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.cyan,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+    - uuid: 5897943d59994543b497dd1ad4c0b43a
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/cyan.cartridge.toner)<20
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.magenta,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Low cartridge toner - cyan'
+      priority: INFO
+      dependencies:
+        - name: 'Empty cartridge toner - cyan'
+          expression: |
+            last(/Printer HP Color LaserJet MFP 178 or 179fnw/cyan.cartridge.toner)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.magenta,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+    - uuid: 4076c3fb2910469e89b43a45b7bbbfcf
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/magenta.cartridge.toner)<20
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.yellow,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Low cartridge toner - magenta'
+      priority: INFO
+      dependencies:
+        - name: 'Empty cartridge toner - magenta'
+          expression: |
+            last(/Printer HP Color LaserJet MFP 178 or 179fnw/magenta.cartridge.toner)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.yellow,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+    - uuid: 024750716cb4477d8dad70b9771df579
+      expression: |
+        last(/Printer HP Color LaserJet MFP 178 or 179fnw/yellow.cartridge.toner)<20
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.black,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+        and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+      name: 'Low cartridge toner - yellow'
+      priority: INFO
+      dependencies:
+        - name: 'Empty cartridge toner - yellow'
+          expression: |
+            last(/Printer HP Color LaserJet MFP 178 or 179fnw/yellow.cartridge.toner)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.black,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/model,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/printer.location,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/serial.number,3w)=0
+            and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/pages.printed.total,3w)=0
+  graphs:
+    - uuid: 106b423a0c9c49088bdf2947444160fa
+      name: 'Black toner level'
+      width: '200'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: '000000'
+          item:
+            host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+            key: black.cartridge.toner
+    - uuid: 16defac846c3495fb2d50dd45d618ae3
+      name: 'Cyan toner level'
+      width: '200'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 00DDDD
+          item:
+            host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+            key: cyan.cartridge.toner
+    - uuid: 407ac6ef6fe7427e92e61f61c61602c2
+      name: 'Magenta toner level'
+      width: '200'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: DD00DD
+          item:
+            host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+            key: magenta.cartridge.toner
+    - uuid: a1ad67d318064e768bb1851e43613d73
+      name: 'Yellow toner level'
+      width: '200'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: DDDD00
+          item:
+            host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+            key: yellow.cartridge.toner
