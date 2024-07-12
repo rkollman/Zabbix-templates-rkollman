@@ -14,7 +14,7 @@ zabbix_export:
         
         Raimond Kollman (Xifeo ICT B.V.)
         
-        Version: 20240706
+        Version: 20240712
       groups:
         - name: Templates/Applications
       items:
@@ -151,8 +151,7 @@ zabbix_export:
           key: pages.printed.total
           delay: '360'
           history: 7d
-          trends: '0'
-          value_type: TEXT
+          value_type: FLOAT
           tags:
             - tag: Application
               value: 'Pages printed'
@@ -459,6 +458,14 @@ zabbix_export:
           item:
             host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
             key: magenta.cartridge.toner
+    - uuid: 5bf96dd7825f42fbb55c023ec0cb8d41
+      name: 'Pages printed'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'Printer HP Color LaserJet MFP 178 or 179fnw'
+            key: pages.printed.total
     - uuid: a1ad67d318064e768bb1851e43613d73
       name: 'Yellow toner level'
       width: '200'
