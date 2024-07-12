@@ -13,6 +13,8 @@ zabbix_export:
         Changed some SNMP OID's to display the right information (location, cartridge color & type). Triggers still work the same and alerts whenever needed.
         
         Raimond Kollman (Xifeo ICT B.V.)
+        
+        Version: 20240706
       groups:
         - name: Templates/Applications
       items:
