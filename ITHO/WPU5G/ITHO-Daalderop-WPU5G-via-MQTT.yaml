@@ -1,0 +1,718 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 434806f8c92a4efd8d83e5b3d9ce6cec
+      name: Kollman
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 56574b114c9e4b76990b1c21fc273f5a
+      template: 'ITHO Daalderop by MQTT'
+      name: 'ITHO Daalderop by MQTT'
+      description: |
+        This is a template for monitoring ITHO Daalderop WPU5G heatpumps via MQTT. The heatpump sends its messages to MQTT by means of a nrg.itho device.
+        
+        Raimond Kollman
+      vendor:
+        name: Raimond Kollman
+        version: 7.0-1
+      groups:
+        - name: Kollman
+        - name: Templates/Applications
+      items:
+        - uuid: fd6c5bc810b24ea0b13d7d002b3b6300
+          name: 'Boiler temperature lower sensor'
+          type: DEPENDENT
+          key: itho.boilertempdown
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Temperature of the water in the lower part of the boiler'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["boilertemp-down_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: boiler
+          triggers:
+            - uuid: b2b3c99cf9504e94a0c76a5879f4c44f
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
+              name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPCOLD} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPCOLD} degrees Celsius it''s being triggered.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 0bae26c793b441a5b9ad1e2e95d75eb7
+              expression: 'timeleft(/ITHO Daalderop by MQTT/itho.boilertempdown,10m,{$ITHO.TEMPCOLD})<300s'
+              name: 'Boiler temperature down is going to be cold (< {$ITHO.TEMPCOLD}) in 5 minutes'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Trigger als de boiler onderin over 5 minuten koud is (gemeten over het verbruik van de afgelopen 10 minuten).'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: ced77441952846999a4daa6980826918
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPLOW}'
+              name: 'Boiler temperature down is low (< {$ITHO.TEMPLOW})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: INFO
+              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPLOW} degrees Celsius it''s being triggered'
+              dependencies:
+                - name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
+                - name: 'Boiler temperature down is very low (< {$ITHO.TEMPVERYLOW})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW}'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: d60dbb5d0e5446839ea3e354a2f42038
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW}'
+              name: 'Boiler temperature down is very low (< {$ITHO.TEMPVERYLOW})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPVERYLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPVERYLOW} degrees Celsius it''s being triggered.'
+              dependencies:
+                - name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 1c7aa46c843d4b73824a37d8daf3b185
+          name: 'Boiler temperature upper sensor'
+          type: DEPENDENT
+          key: itho.boilertempup
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Temperature of the water in the upper part of the boiler'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["boilertemp-up_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: boiler
+          triggers:
+            - uuid: 7c12e976ecfc47069678730f1396dfe7
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+              name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPCOLD} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPCOLD} degrees Celsius it''s being triggered.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: c9bbf913baf040ecbc289ecac449c9b3
+              expression: 'timeleft(/ITHO Daalderop by MQTT/itho.boilertempup,10m,{$ITHO.TEMPCOLD})<=300s'
+              name: 'Boiler temperature up is going to be cold in 5 minutes (< {$ITHO.TEMPCOLD})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Gemeten over de laatste 10 minuten, is de voorspelling dat over 5 minuten het water in de boiler overal te koud is, niet meer douchen! :-).'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: d0a5e05a78c24abfbbfd5de313a9b851
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPLOW}'
+              name: 'Boiler temperature up is low (< {$ITHO.TEMPLOW})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: INFO
+              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPLOW} degrees Celsius it''s being triggered.'
+              dependencies:
+                - name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+                - name: 'Boiler temperature up is very low (< {$ITHO.TEMPVERYLOW})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: 3ac815cb7ca74209b1eea3b91d823bd8
+              expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
+              name: 'Boiler temperature up is very low (< {$ITHO.TEMPVERYLOW})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPVERYLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPVERYLOW} degrees Celsius it''s being triggered.'
+              dependencies:
+                - name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: edaaa88afeb64c7691c3e0d60846de21
+          name: 'CV druk'
+          type: DEPENDENT
+          key: itho.cv-pressure_bar
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bar
+          description: 'Temperature of the water in the lower part of the boiler'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["cv-pressure_bar"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: heating
+            - tag: ITHO
+              value: pressure
+          triggers:
+            - uuid: a6a1e604239a46078f6074e2f6def62a
+              expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)<1.2'
+              name: 'CV pressure is low (under 1.2 bar)'
+              opdata: 'Current pressure: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Informational message when the CV pressure is below 1.2 bar.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: f300b1e2e1d34c6b8587cb174ad7116d
+          name: 'Delivery source temperature'
+          type: DEPENDENT
+          key: itho.deliverysourcetemp
+          delay: '0'
+          history: 7d
+          units: °C
+          description: 'The temperature of the water when it''s extracted from the source/well.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["temp-from-source_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: source
+        - uuid: 3781e43f344d41b088d861e653422519
+          name: 'Energy consumption during cooling'
+          type: DEPENDENT
+          key: itho.econsumption-cooling
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: MWh
+          description: 'Energy consumption during cooling mode.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["e-consumption-during-cooling_kwh"]'
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: energy
+        - uuid: a670cf3870834b528ef925b642d88355
+          name: 'Energy consumption during hot water heating'
+          type: DEPENDENT
+          key: itho.econsumption-dhw
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: MWh
+          description: 'Energy consumption during warm water heating (boiler) mode.'
+          valuemap:
+            name: 'Energy Units'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["e-consumption-during-dhw_kwh"]'
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: energy
+        - uuid: b7fca425e45046ff8c7e0a220e12cb51
+          name: 'Energy consumption during heating'
+          type: DEPENDENT
+          key: itho.econsumption-heating
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: MWh
+          description: 'Energy consumption during heating mode.'
+          valuemap:
+            name: 'Energy Units'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["e-consumption-during-heating_kwh"]'
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: energy
+        - uuid: 3363ef03af0241c894977d2867a63411
+          name: 'Energy consumption during stand-by'
+          type: DEPENDENT
+          key: itho.econsumption-standby
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: MWh
+          description: 'Energy consumption during stand-by mode.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["e-consumption-during-stand-by_kwh"]'
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: energy
+        - uuid: 7c892a967849499f9666a258e8fa9dfd
+          name: 'Requested room temperature'
+          type: DEPENDENT
+          key: itho.reqroomtemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Requested room temperature in the main room/on the main spider.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["requested-roomemp_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: room
+        - uuid: 8101a8d7a571480688830fae037ef1bc
+          name: 'Return delivery source temperature'
+          type: DEPENDENT
+          key: itho.returndeliverysourcetemp
+          delay: '0'
+          history: 7d
+          units: °C
+          description: 'The temperature of the water when it''s going back to the source/well.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["temp-to-source_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: source
+        - uuid: a6f91470e7d1424db03083edde2f3476
+          name: 'Room temperature'
+          type: DEPENDENT
+          key: itho.roomtemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Current room temperature in the main room / measured on the main spider.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["room-temp_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: room
+        - uuid: 7a54bbafdd764a8fb8d37575713f196b
+          name: 'ITHO Status topic'
+          type: ZABBIX_ACTIVE
+          key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          delay: '0'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          description: 'The main itho status topic and messages from which information can be derived.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '600'
+          tags:
+            - tag: ITHO
+              value: status
+      tags:
+        - tag: application
+          value: ITHO
+        - tag: service
+          value: boiler
+        - tag: service
+          value: heating
+      macros:
+        - macro: '{$ITHO.MQTTHOST}'
+          value: 'tcp://hostname'
+          description: 'Fill in your MQTT hostname'
+        - macro: '{$ITHO.MQTTPASSWD}'
+          type: SECRET_TEXT
+          description: 'Your MQTT password'
+        - macro: '{$ITHO.MQTTPORT}'
+          value: '1883'
+          description: 'Fill in the MQTT port at which MQTT is listening'
+        - macro: '{$ITHO.MQTTUSER}'
+          value: itho
+          description: 'Your MQTT user'
+        - macro: '{$ITHO.TEMPCOLD}'
+          value: '20'
+          description: 'Temperature level when water temperature is cold'
+        - macro: '{$ITHO.TEMPLOW}'
+          value: '30'
+          description: 'Temperature level when water temperature is low'
+        - macro: '{$ITHO.TEMPVERYLOW}'
+          value: '25'
+          description: 'Temperature level when water temperature is very low'
+        - macro: '{$ITHO.TOPIC}'
+          value: itho/ithostatus
+          description: 'Topic to which the ITHO status messages are sent'
+      dashboards:
+        - uuid: 441c26b1941145b3bd52d6f3ef960c79
+          name: 'ITHO WPU5G Heatpump'
+          display_period: '60'
+          pages:
+            - name: 'ITHO WPU5G Graphs'
+              widgets:
+                - type: gauge
+                  name: 'Boiler upper sensor'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        key: itho.boilertempdown
+                    - type: STRING
+                      name: max
+                      value: '60'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: show.3
+                      value: '4'
+                    - type: INTEGER
+                      name: show.4
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 4000FF
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0040FF
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00BFFF
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '30'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: FF0000
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '35'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: value_arc_color
+                      value: 00BFFF
+                - type: graph
+                  'y': '5'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        name: 'Boiler temperature'
+                    - type: STRING
+                      name: reference
+                      value: OQUGC
+                - type: graph
+                  'y': '10'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        name: 'Energy consumption'
+                    - type: STRING
+                      name: reference
+                      value: FUUVV
+                - type: gauge
+                  name: 'Boiler lower sensor'
+                  x: '18'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        key: itho.boilertempup
+                    - type: STRING
+                      name: max
+                      value: '60'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: show.3
+                      value: '4'
+                    - type: INTEGER
+                      name: show.4
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 4000FF
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0040FF
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00BFFF
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '30'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: FF0000
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '35'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: value_arc_color
+                      value: 00BFFF
+                - type: graph
+                  x: '36'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        name: 'Room temperature'
+                    - type: STRING
+                      name: reference
+                      value: YXOQY
+                - type: graph
+                  x: '36'
+                  'y': '5'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        name: 'Source/well water temperature (return) delivery'
+                    - type: STRING
+                      name: reference
+                      value: PLCKG
+                - type: graph
+                  x: '36'
+                  'y': '10'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'ITHO Daalderop by MQTT'
+                        name: 'CV druk'
+                    - type: STRING
+                      name: reference
+                      value: IUGFW
+      valuemaps:
+        - uuid: 45ccb7d618e1482096adf76706fad910
+          name: 'Energy Units'
+          mappings:
+            - value: kWh
+              newvalue: MWh
+  graphs:
+    - uuid: 16ece1708304436da08c8365218f37d1
+      name: 'Boiler temperature'
+      ymin_type_1: FIXED
+      graph_items:
+        - color: 0040FF
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.boilertempdown
+        - sortorder: '1'
+          color: FF0000
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.boilertempup
+    - uuid: 8d0d307796ef4b24855808ac8711ae50
+      name: 'CV druk'
+      ymin_type_1: FIXED
+      graph_items:
+        - color: FF8000
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.cv-pressure_bar
+    - uuid: 549bb7cb478e4c7aab113832c660cdd9
+      name: 'Energy consumption'
+      graph_items:
+        - color: 0040FF
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.econsumption-cooling
+        - sortorder: '1'
+          color: FF8000
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.econsumption-heating
+        - sortorder: '2'
+          color: 66BB6A
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.econsumption-standby
+        - sortorder: '3'
+          color: FF0000
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.econsumption-dhw
+    - uuid: 94b04dbc7d4649db946032300dae03bc
+      name: 'Room temperature'
+      ymin_type_1: FIXED
+      graph_items:
+        - color: 4CAF50
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.roomtemp
+        - sortorder: '1'
+          color: FF0000
+          calc_fnc: MIN
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.reqroomtemp
+    - uuid: d46adaa105294cae9d07235a7f1eecd0
+      name: 'Source/well water temperature (return) delivery'
+      graph_items:
+        - color: 0040FF
+          calc_fnc: ALL
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.returndeliverysourcetemp
+        - sortorder: '1'
+          color: FF0000
+          calc_fnc: ALL
+          item:
+            host: 'ITHO Daalderop by MQTT'
+            key: itho.deliverysourcetemp
