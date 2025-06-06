@@ -11,10 +11,9 @@ zabbix_export:
         Cloned and adapted template from Printer HP Color LaserJet CP2025dn to work with HP Color Laser MFP 178/179fnw printer.
         
         Changed some SNMP OID's to display the right information (location, cartridge color & type). Triggers still work the same and alerts whenever needed.
-        
-        Raimond Kollman (Xifeo ICT B.V.)
-        
-        Version: 20240712
+      vendor:
+        name: Raimond Kollman
+        version: 7.0-0
       groups:
         - name: Templates/Applications
       items:
