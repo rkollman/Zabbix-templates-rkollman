@@ -17,7 +17,6 @@ zabbix_export:
         name: 'Raimond Kollman'
         version: 7.0-2
       groups:
-        - name: Kollman
         - name: Templates/Applications
       items:
         - uuid: c5359c23efee4413a2bb86a44462688f
