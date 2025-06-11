@@ -12,12 +12,13 @@ zabbix_export:
       description: |
         This is a template for monitoring ITHO Daalderop WPU5G heatpumps via MQTT. The heatpump sends its messages to MQTT by means of a nrg.itho device.
         
+        This NRG Itho device can be obtained from: https://www.nrgwatch.nl/product/itho-non-cve-wifi-module/
+        
         Raimond Kollman
       vendor:
-        name: Raimond Kollman
-        version: 7.0-1
+        name: 'Raimond Kollman'
+        version: 7.0-2
       groups:
-        - name: Kollman
         - name: Templates/Applications
       items:
         - uuid: fd6c5bc810b24ea0b13d7d002b3b6300
@@ -177,11 +178,28 @@ zabbix_export:
               value: pressure
           triggers:
             - uuid: a6a1e604239a46078f6074e2f6def62a
-              expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)<1.2'
-              name: 'CV pressure is low (under 1.2 bar)'
+              expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)<{$ITHO.CVPRESSURE_CRIT}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)>={$ITHO.CVPRESSURE_CRIT}'
+              name: 'CV pressure is low (under {$ITHO.CVPRESSURE_CRIT} bar)'
               opdata: 'Current pressure: {ITEM.LASTVALUE}'
-              priority: AVERAGE
-              description: 'Informational message when the CV pressure is below 1.2 bar.'
+              priority: HIGH
+              description: 'High alert message when the CV pressure is below {$ITHO.CVPRESSURE_CRIT} bar.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 35cc4ccad45b41eda209ad8b8080c91a
+              expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)<{$ITHO.CVPRESSURE_WARN}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)>={$ITHO.CVPRESSURE_WARN}'
+              name: 'CV pressure is low (under {$ITHO.CVPRESSURE_WARN} bar)'
+              opdata: 'Current pressure: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Warning message when the CV pressure is below {$ITHO.CVPRESSURE_WARN} bar.'
+              dependencies:
+                - name: 'CV pressure is low (under {$ITHO.CVPRESSURE_CRIT} bar)'
+                  expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)<{$ITHO.CVPRESSURE_CRIT}'
+                  recovery_expression: 'last(/ITHO Daalderop by MQTT/itho.cv-pressure_bar,#3)>={$ITHO.CVPRESSURE_CRIT}'
               tags:
                 - tag: scope
                   value: performance
@@ -379,10 +397,12 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           tags:
-            - tag: ITHO
-              value: status
+            - tag: component
+              value: ITHO
+            - tag: component
+              value: raw
       tags:
         - tag: application
           value: ITHO
@@ -391,6 +411,12 @@ zabbix_export:
         - tag: service
           value: heating
       macros:
+        - macro: '{$ITHO.CVPRESSURE_CRIT}'
+          value: '1.2'
+          description: 'Critical level CV-pressure'
+        - macro: '{$ITHO.CVPRESSURE_WARN}'
+          value: '1.4'
+          description: 'Warning level CV-pressure'
         - macro: '{$ITHO.MQTTHOST}'
           value: 'tcp://hostname'
           description: 'Fill in your MQTT hostname'
