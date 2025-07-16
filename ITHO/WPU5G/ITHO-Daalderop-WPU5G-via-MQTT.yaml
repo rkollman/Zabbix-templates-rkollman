@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-2
+        version: 7.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -36,7 +36,7 @@ zabbix_export:
                 - '$.["boilertemp-down_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -102,7 +102,7 @@ zabbix_export:
                 - '$.["boilertemp-up_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -160,7 +160,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          units: bar
+          units: '!bar'
           description: 'Temperature of the water in the lower part of the boiler'
           preprocessing:
             - type: JSONPATH
@@ -168,7 +168,7 @@ zabbix_export:
                 - '$.["cv-pressure_bar"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 600s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -217,7 +217,7 @@ zabbix_export:
                 - '$.["temp-from-source_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 600s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -241,7 +241,7 @@ zabbix_export:
                 - '0.001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 600s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -267,7 +267,7 @@ zabbix_export:
                 - '0.001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 600s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -317,7 +317,7 @@ zabbix_export:
                 - '0.001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -338,7 +338,7 @@ zabbix_export:
                 - '$.["requested-roomemp_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -358,7 +358,7 @@ zabbix_export:
                 - '$.["temp-to-source_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 600s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
@@ -379,21 +379,17 @@ zabbix_export:
                 - '$.["room-temp_c"]'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - '600'
+                - 300s
           master_item:
             key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
           tags:
             - tag: ITHO
               value: room
-        - uuid: 7a54bbafdd764a8fb8d37575713f196b
+        - uuid: 7acbde9ecf5e4e878c7a288a81c5f1c8
           name: 'ITHO Status topic'
-          type: ZABBIX_ACTIVE
           key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
-          delay: '0'
-          history: '0'
           value_type: TEXT
           trends: '0'
-          description: 'The main itho status topic and messages from which information can be derived.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
