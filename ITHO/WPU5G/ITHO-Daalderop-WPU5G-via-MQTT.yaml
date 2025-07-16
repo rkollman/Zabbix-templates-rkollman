@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-3
+        version: 7.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -387,7 +387,10 @@ zabbix_export:
               value: room
         - uuid: 7acbde9ecf5e4e878c7a288a81c5f1c8
           name: 'ITHO Status topic'
+          type: ZABBIX_ACTIVE
           key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHO.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          delay: '0'
+          history: '0'
           value_type: TEXT
           trends: '0'
           preprocessing:
