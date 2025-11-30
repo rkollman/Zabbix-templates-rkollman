@@ -1,0 +1,666 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: f2a22e29e05f463ba3c572f5d69c42fc
+      name: Kollman/ITHO
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: a8fa7ca9622a449abb6aae21df75417e
+      template: 'ITHO HRU300 Duo Daalderop by MQTT'
+      name: 'ITHO HRU300 Duo Daalderop by MQTT'
+      description: |
+        This is a template for monitoring ITHO Daalderop HRU300 Duo WTW units via MQTT. The WTW unit sends its messages to MQTT by means of a nrg.itho device.
+        
+        This NRG Itho device can be obtained from: https://www.nrgwatch.nl/product/itho-non-cve-wifi-module/
+        
+        Raimond Kollman
+      vendor:
+        name: 'Raimond Kollman'
+        version: 7.0-0
+      groups:
+        - name: Kollman/ITHO
+        - name: Templates/Applications
+      items:
+        - uuid: d53a8f4cb2e042929bc1cf9a1f7f6e95
+          name: 'Blown out air'
+          type: DEPENDENT
+          key: ithohru.blownair
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!m3h'
+          description: 'Flow of blown air in m3/hour'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["the-flow-of-the-blown-air_m3h"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+        - uuid: 504abdd21191462f9a515f24fa14cd4c
+          name: 'Bypass valve percentage open'
+          type: DEPENDENT
+          key: ithohru.bypassvalvepercentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage that the bypass valve is open'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["percentage-that-the-bypass-valve-is-open_perc"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+        - uuid: e816156b76bc4185a36267c8a688a9ea
+          name: 'CO2 measured'
+          type: DEPENDENT
+          key: ithohru.co2measured
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!ppm'
+          description: 'Measured outside temperature'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["highest-measured-co2_ppm"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+          triggers:
+            - uuid: 3bc47cfab4d445819c596c0788661c34
+              expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)>{$HIGHPPM}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}'
+              name: 'Average air quality last 10 minutes higher than {$HIGHPPM} ppm'
+              opdata: 'Current air quality in ppm: {ITEM.LASTVALUE}'
+              url_name: 'Host dashboard'
+              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+              priority: HIGH
+              description: 'Air quality is very poor quality, it''s time to really start ventilating. Maybe open some windows?'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: 000a5c4e60724e53b9aaeb89b7505ca5
+              expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)>{$WARNINGPPM}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}-200'
+              name: 'Average air quality last 10 minutes higher than {$WARNINGPPM} ppm'
+              opdata: 'Current air quality in ppm: {ITEM.LASTVALUE}'
+              url_name: 'Host dashboard'
+              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+              priority: AVERAGE
+              description: 'Air quality is of average quality. Ventilate more!'
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Average air quality last 10 minutes higher than {$HIGHPPM} ppm'
+                  expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)>{$HIGHPPM}'
+                  recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: ca8f4ae03d2347f1ba47625d8ce231be
+          name: 'Desired inlet temperature'
+          type: DEPENDENT
+          key: ithohru.desiredinlettemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Desired inlet temperature'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["the-desired-inlet-temperature_c"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: outside
+            - tag: ITHO
+              value: temperature
+        - uuid: 848e28fa89214e1ba9b8e13560c5e24a
+          name: 'Filter error'
+          type: DEPENDENT
+          key: ithohru.error-number
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Error-state of the HRU system'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["error-number"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 600s
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+            - tag: ITHO
+              value: filter
+          triggers:
+            - uuid: 87fd8b47204a4300a5a1e2ef33f21aec
+              expression: 'last(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.error-number,#3)<>0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.error-number,#5)=0'
+              name: 'ITHO HRU has an error'
+              opdata: 'Current error: {ITEM.LASTVALUE}'
+              url_name: 'Host dashboard'
+              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+              priority: HIGH
+              description: 'The WTW unit is reporting an error'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 98546691cc8744608da5b09ddc95bcd9
+          name: 'Current consumption of fan'
+          type: DEPENDENT
+          key: ithohru.fanconsumption
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!mAh'
+          description: 'RPM of the motor'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["current-consumption-of-fan_ma"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: energy
+            - tag: ITHO
+              value: motor
+        - uuid: dd251b9ca1804e1081c17b3e9edfbb03
+          name: 'Fan percentage'
+          type: DEPENDENT
+          key: ithohru.fanpercentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of usage of the fan'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["absolute-speed-of-the-fan_perc"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: motor
+        - uuid: 4a045bb2e1dd4de3ab5fb683990e2ce6
+          name: 'Inflated air'
+          type: DEPENDENT
+          key: ithohru.inflatedair
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!m3h'
+          description: 'Flow of inflated air in m3/hour'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["the-flow-of-the-inflated-air_m3h"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+        - uuid: 12c0f785600a4029834c4d52ac744a0a
+          name: 'Inlet temperature'
+          type: DEPENDENT
+          key: ithohru.inlettemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Measured outside temperature'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["inlet-temperature_c"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: outside
+            - tag: ITHO
+              value: temperature
+        - uuid: cc05e63b6f6b40c9bd5c64e3cc824393
+          name: 'Mass flow of air entering house'
+          type: DEPENDENT
+          key: ithohru.masflowairenteringhouse
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!kgh'
+          description: 'Flow of air entering the house in kg/hour'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["the-mass-flow-of-the-air-entering-the-house_kgh"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+        - uuid: d9454cde13684039bc3919566f794e85
+          name: 'Mass flow of air leaving house'
+          type: DEPENDENT
+          key: ithohru.masflowairleavinghouse
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!kgh'
+          description: 'Flow of air leaving the house in kg/hour'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["the-mass-flow-of-the-air-leaving-the-house_kgh"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: air
+        - uuid: ed8b8b1ef7a4420c9c7f16d20bf2cf71
+          name: 'Outlet temperature'
+          type: DEPENDENT
+          key: ithohru.outlettemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Temperature of the air blown out the house'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["temperature-of-the-blown-out-air-of-the-house_c"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: inside
+            - tag: ITHO
+              value: temperature
+        - uuid: 0c7992e024664d7da0057115e1ab0065
+          name: 'Outside temperature'
+          type: DEPENDENT
+          key: ithohru.outsidetemp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: 'Measured outside temperature'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["measured-outside-temperature_c"]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 180s
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: outside
+        - uuid: cdc745a820714ba9b6d8890391df78a2
+          name: 'Relative humidity percentage'
+          type: DEPENDENT
+          key: ithohru.rhpercentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The measured relative humidity'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["highest-measured-rh_perc"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: humidity
+          triggers:
+            - uuid: cb99b65f337148a6a173c9028a8ccf92
+              expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>80'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<78'
+              name: 'Average relative humidity average'
+              opdata: 'Current RH: {ITEM.LASTVALUE}'
+              url_name: 'Host dashboard'
+              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+              priority: INFO
+              description: 'Average relative humidity last 10 minutes is higher than 80%'
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Average relative humidity high'
+                  expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>90'
+                  recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<81'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: 164be9e621904a4a9f0d38ad9be94a68
+              expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>90'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<81'
+              name: 'Average relative humidity high'
+              opdata: 'Current RH: {ITEM.LASTVALUE}'
+              url_name: 'Host dashboard'
+              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+              priority: WARNING
+              description: 'Average relative humidity last 10 minutes is higher than 90%'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 85cdd23299b44903932c7f8d862e61a7
+          name: 'Motor RPM'
+          type: DEPENDENT
+          key: ithohru.rpmmotor
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!rpm'
+          description: 'RPM of the motor'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.["rpm-of-the-motor_rpm"]'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: motor
+        - uuid: 7f3475e59eef434eb8291d50f4d8e841
+          name: 'ITHO HRU Status topic'
+          type: ZABBIX_ACTIVE
+          key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          delay: '0'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 180s
+          tags:
+            - tag: component
+              value: ITHO
+            - tag: component
+              value: raw
+      tags:
+        - tag: application
+          value: ITHO
+        - tag: service
+          value: air
+        - tag: service
+          value: wtw
+      macros:
+        - macro: '{$HIGHPPM}'
+          value: '2000'
+          description: 'When ppm of air is higher than this, give high alert'
+        - macro: '{$ITHO.MQTTHOST}'
+          value: 'tcp://hostname'
+          description: 'Fill in your MQTT hostname'
+        - macro: '{$ITHO.MQTTPASSWD}'
+          type: SECRET_TEXT
+          description: 'Your MQTT password'
+        - macro: '{$ITHO.MQTTPORT}'
+          value: '1883'
+          description: 'Fill in the MQTT port at which MQTT is listening'
+        - macro: '{$ITHO.MQTTUSER}'
+          value: itho
+          description: 'Your MQTT user'
+        - macro: '{$ITHOHRU.TOPIC}'
+          value: ithohru/ithostatus
+          description: 'Topic to which the ITHO HRU status messages are sent'
+        - macro: '{$WARNINGPPM}'
+          value: '1200'
+          description: 'When ppm of air is higher than this, give warning'
+      dashboards:
+        - uuid: cb3437165d2443c4a3b0adc5ee628f85
+          name: 'ITHO HRU WTW unit'
+          pages:
+            - widgets:
+                - type: svggraph
+                  name: Temperatures
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0080FF
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Inlet temperature'
+                    - type: STRING
+                      name: ds.0.items.1
+                      value: 'Desired inlet temperature'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color
+                      value: FF465C
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Outlet temperature'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.2.color
+                      value: 81C784
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Outside temperature'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: DWDPM
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: 'CO2 vs RPM'
+                  'y': '5'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: FFBF00
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '2'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'CO2 measured'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color
+                      value: '000000'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Motor RPM'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_max
+                      value: '2250'
+                    - type: STRING
+                      name: lefty_min
+                      value: '250'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: NIZOC
+                    - type: STRING
+                      name: righty_max
+                      value: '2250'
+                    - type: STRING
+                      name: righty_min
+                      value: '250'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: 'Air flow in m3/hour'
+                  x: '36'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 00BFFF
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Blown air'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color
+                      value: FF465C
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Inflated air'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: UFWNE
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: 'Air flow in kg/hour'
+                  x: '36'
+                  'y': '5'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 00BFFF
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Mass flow of air leaving house'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color
+                      value: FF465C
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Mass flow of air entering house'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: QLFUA
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+  graphs:
+    - uuid: c898adcd596e42b2b73326fdc5c2039f
+      name: 'Inlet and outlet temperature vs outside temperature'
+      graph_items:
+        - drawtype: BOLD_LINE
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'ITHO HRU300 Duo Daalderop by MQTT'
+            key: ithohru.inlettemp
+        - sortorder: '1'
+          drawtype: BOLD_LINE
+          color: CC6600
+          calc_fnc: ALL
+          item:
+            host: 'ITHO HRU300 Duo Daalderop by MQTT'
+            key: ithohru.outlettemp
+        - sortorder: '2'
+          drawtype: FILLED_REGION
+          color: 0080FF
+          calc_fnc: ALL
+          item:
+            host: 'ITHO HRU300 Duo Daalderop by MQTT'
+            key: ithohru.outsidetemp
