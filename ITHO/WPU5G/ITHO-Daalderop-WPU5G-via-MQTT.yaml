@@ -1,7 +1,7 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    - uuid: 434806f8c92a4efd8d83e5b3d9ce6cec
+    - uuid: f2a22e29e05f463ba3c572f5d69c42fc
       name: Kollman/ITHO
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-5
+        version: 7.0-6
       groups:
         - name: Kollman/ITHO
         - name: Templates/Applications

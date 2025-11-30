@@ -2,6 +2,20 @@
 
 Alle belangrijke wijzigingen aan dit project worden in dit bestand gedocumenteerd.
 
+## [7.0-6]
+
+### Added
+- -
+
+### Changed
+- -
+
+### Fixed
+- Group Kollman/ITHO was not added right. Fixed this.
+
+### Removed
+- —  
+
 ## [7.0-5]
 
 ### Added
