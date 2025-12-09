@@ -7,10 +7,10 @@ zabbix_export:
       name: Templates/Applications
   templates:
     - uuid: 48d19098672f4e7aa7dab1942260d87d
-      template: 'Fail2ban - Active'
-      name: 'Fail2ban - Active'
+      template: 'fail2ban by Zabbix agent active'
+      name: 'fail2ban by Zabbix agent active'
       description: |
-        Fail2Ban for Zabbix Active Agents, 
+        fail2ban for Zabbix agents Active. 
         
         This template is based on the Fail2Ban template by 
         Tomas Hermanek and published on (https://github.com/zabbix/community-templates/tree/main/Applications/Firewall/template_fail2ban)
@@ -30,7 +30,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-1
+        version: 7.0-2
       groups:
         - name: Kollman
         - name: Templates/Applications
@@ -48,7 +48,7 @@ zabbix_export:
               value: fail2ban
           triggers:
             - uuid: ffa07343b51d4bf58c2b8c324c6a7a62
-              expression: 'last(/Fail2ban - Active/proc.num[fail2ban-server])=0'
+              expression: 'last(/fail2ban by Zabbix agent active/proc.num[fail2ban-server])=0'
               name: 'Fail2ban server is Down'
               priority: AVERAGE
       discovery_rules:
@@ -65,38 +65,49 @@ zabbix_export:
               name: 'Fail2ban {#JAIL} currently banned IPs'
               type: ZABBIX_ACTIVE
               key: 'fail2ban.status[{#JAIL}]'
-              units: count
+              units: '!IP adresses'
               description: 'The current banned IPs for a specific fail2ban jail'
               tags:
                 - tag: application
                   value: fail2ban
               trigger_prototypes:
                 - uuid: 5fb0112ea4f14b4fae1330e178f0721e
-                  expression: 'avg(/Fail2ban - Active/fail2ban.status[{#JAIL}],10m)>{$FAIL2BANHIGH}'
-                  name: 'Fail2ban {#JAIL} banned IPs high count last 10 minutes'
+                  expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)>={$FAIL2BANHIGH}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)<={$FAIL2BANHIGH} - 2'
+                  name: 'High level of Fail2ban {#JAIL} banned IPs'
+                  event_name: 'Fail2ban {#JAIL} banned IPs above {$FAIL2BANHIGH}'
+                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.LASTVALUE}'
                   priority: HIGH
-                  description: 'The average of banned IPs the last 10 minutes are more than {$FAIL2BANHIGH}'
+                  description: 'The number of banned IPs the last 10 checks are more than {$FAIL2BANHIGH}'
+                  manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: performance
                 - uuid: cd8f015644964634b0eef6248e2ff451
-                  expression: 'avg(/Fail2ban - Active/fail2ban.status[{#JAIL}],10m)>{$FAIL2BANWARN}'
-                  name: 'Fail2ban {#JAIL} banned IPs warning count last 10 minutes'
+                  expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)>={$FAIL2BANWARN}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)<={$FAIL2BANWARN} - 2'
+                  name: 'Warning level Fail2ban {#JAIL} banned IPs'
+                  event_name: 'Fail2ban {#JAIL} banned IPs above {$FAIL2BANWARN}'
+                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'The average of banned IPs the last 10 minutes are more than {$FAIL2BANWARN}'
+                  description: 'The number of banned IPs the last 10 checks are more than {$FAIL2BANWARN}'
+                  manual_close: 'YES'
                   dependencies:
-                    - name: 'Fail2ban {#JAIL} banned IPs high count last 10 minutes'
-                      expression: 'avg(/Fail2ban - Active/fail2ban.status[{#JAIL}],10m)>{$FAIL2BANHIGH}'
+                    - name: 'High level of Fail2ban {#JAIL} banned IPs'
+                      expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)>={$FAIL2BANHIGH}'
+                      recovery_expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)<={$FAIL2BANHIGH} - 2'
                   tags:
                     - tag: scope
                       value: performance
           graph_prototypes:
             - uuid: b151e34af81548b1b92cf0a6b36cdee7
-              name: 'Number of banned IPs on jail {#JAIL}'
+              name: 'Number of banned IPs on {#JAIL}'
               graph_items:
                 - color: 00C800
                   item:
-                    host: 'Fail2ban - Active'
+                    host: 'fail2ban by Zabbix agent active'
                     key: 'fail2ban.status[{#JAIL}]'
       macros:
         - macro: '{$FAIL2BANHIGH}'
