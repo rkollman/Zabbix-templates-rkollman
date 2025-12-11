@@ -30,7 +30,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-2
+        version: 7.0-3
       groups:
         - name: Kollman
         - name: Templates/Applications
@@ -77,7 +77,7 @@ zabbix_export:
                   recovery_expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)<={$FAIL2BANHIGH} - 2'
                   name: 'High level of Fail2ban {#JAIL} banned IPs'
                   event_name: 'Fail2ban {#JAIL} banned IPs above {$FAIL2BANHIGH}'
-                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.LASTVALUE}'
+                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The number of banned IPs the last 10 checks are more than {$FAIL2BANHIGH}'
                   manual_close: 'YES'
@@ -90,7 +90,7 @@ zabbix_export:
                   recovery_expression: 'last(/fail2ban by Zabbix agent active/fail2ban.status[{#JAIL}],#10)<={$FAIL2BANWARN} - 2'
                   name: 'Warning level Fail2ban {#JAIL} banned IPs'
                   event_name: 'Fail2ban {#JAIL} banned IPs above {$FAIL2BANWARN}'
-                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.LASTVALUE}'
+                  opdata: 'Number of banned IPs for {#JAIL} is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The number of banned IPs the last 10 checks are more than {$FAIL2BANWARN}'
                   manual_close: 'YES'
