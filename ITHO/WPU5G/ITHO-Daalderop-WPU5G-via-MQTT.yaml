@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-6
+        version: 7.0-7
       groups:
         - name: Kollman/ITHO
         - name: Templates/Applications
@@ -47,7 +47,7 @@ zabbix_export:
             - uuid: b2b3c99cf9504e94a0c76a5879f4c44f
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
               name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
@@ -58,7 +58,7 @@ zabbix_export:
             - uuid: 0bae26c793b441a5b9ad1e2e95d75eb7
               expression: 'timeleft(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,10m,{$ITHO.TEMPCOLD})<300s'
               name: 'Boiler temperature down is going to be cold (< {$ITHO.TEMPCOLD}) in 5 minutes'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING
@@ -69,7 +69,7 @@ zabbix_export:
             - uuid: ced77441952846999a4daa6980826918
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPLOW}'
               name: 'Boiler temperature down is low (< {$ITHO.TEMPLOW})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current down sensor temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: INFO
@@ -85,7 +85,7 @@ zabbix_export:
             - uuid: d60dbb5d0e5446839ea3e354a2f42038
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW}'
               name: 'Boiler temperature down is very low (< {$ITHO.TEMPVERYLOW})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING
@@ -121,7 +121,7 @@ zabbix_export:
             - uuid: 7c12e976ecfc47069678730f1396dfe7
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
               name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
@@ -132,7 +132,7 @@ zabbix_export:
             - uuid: c9bbf913baf040ecbc289ecac449c9b3
               expression: 'timeleft(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,10m,{$ITHO.TEMPCOLD})<=300s'
               name: 'Boiler temperature up is going to be cold in 5 minutes (< {$ITHO.TEMPCOLD})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
@@ -143,7 +143,7 @@ zabbix_export:
             - uuid: d0a5e05a78c24abfbbfd5de313a9b851
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPLOW}'
               name: 'Boiler temperature up is low (< {$ITHO.TEMPLOW})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: INFO
@@ -159,7 +159,7 @@ zabbix_export:
             - uuid: 3ac815cb7ca74209b1eea3b91d823bd8
               expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
               name: 'Boiler temperature up is very low (< {$ITHO.TEMPVERYLOW})'
-              opdata: 'Current temperature: {ITEM.LASTVALUE}'
+              opdata: 'Current temperature: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING
@@ -199,7 +199,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.cv-pressure_bar,#3)>={$ITHO.CVPRESSURE_CRIT}'
               name: 'CV pressure is low (under {$ITHO.CVPRESSURE_CRIT} bar)'
-              opdata: 'Current pressure: {ITEM.LASTVALUE}'
+              opdata: 'Current pressure: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: HIGH
@@ -212,7 +212,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.cv-pressure_bar,#3)>={$ITHO.CVPRESSURE_WARN}'
               name: 'CV pressure is low (under {$ITHO.CVPRESSURE_WARN} bar)'
-              opdata: 'Current pressure: {ITEM.LASTVALUE}'
+              opdata: 'Current pressure: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING

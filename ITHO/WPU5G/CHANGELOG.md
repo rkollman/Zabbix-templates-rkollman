@@ -2,19 +2,16 @@
 
 Alle belangrijke wijzigingen aan dit project worden in dit bestand gedocumenteerd.
 
-## [7.0-6]
 
-### Added
-- -
+## [7.0-7]
 
 ### Changed
-- -
+- Changed operational data in triggers to {ITEM.VALUE} instead of {ITEM.LASTVALUE}
+
+## [7.0-6]
 
 ### Fixed
 - Group Kollman/ITHO was not added right. Fixed this.
-
-### Removed
-- —  
 
 ## [7.0-5]
 
@@ -25,12 +22,6 @@ Alle belangrijke wijzigingen aan dit project worden in dit bestand gedocumenteer
 
 ### Changed
 - Changed some triggers to only run when a problem is detected 3 times in a row.
-
-### Fixed
-- —  
-
-### Removed
-- —  
 
 ---
 
