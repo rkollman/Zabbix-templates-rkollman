@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-0
+        version: 7.0-1
       groups:
         - name: Kollman/ITHO
         - name: Templates/Applications
@@ -82,7 +82,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}'
               name: 'Average air quality last 10 minutes higher than {$HIGHPPM} ppm'
-              opdata: 'Current air quality in ppm: {ITEM.LASTVALUE}'
+              opdata: 'Current air quality in ppm: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: HIGH
@@ -96,7 +96,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}-200'
               name: 'Average air quality last 10 minutes higher than {$WARNINGPPM} ppm'
-              opdata: 'Current air quality in ppm: {ITEM.LASTVALUE}'
+              opdata: 'Current air quality in ppm: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
@@ -157,7 +157,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.error-number,#5)=0'
               name: 'ITHO HRU has an error'
-              opdata: 'Current error: {ITEM.LASTVALUE}'
+              opdata: 'Current error: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: HIGH
@@ -342,15 +342,15 @@ zabbix_export:
               expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>80'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<78'
-              name: 'Average relative humidity average'
-              opdata: 'Current RH: {ITEM.LASTVALUE}'
+              name: 'Relative humidity average'
+              opdata: 'Current RH: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: INFO
               description: 'Average relative humidity last 10 minutes is higher than 80%'
               manual_close: 'YES'
               dependencies:
-                - name: 'Average relative humidity high'
+                - name: 'Relative humidity high'
                   expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>90'
                   recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<81'
               tags:
@@ -360,8 +360,8 @@ zabbix_export:
               expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)>90'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<81'
-              name: 'Average relative humidity high'
-              opdata: 'Current RH: {ITEM.LASTVALUE}'
+              name: 'Relative humidity high'
+              opdata: 'Current RH: {ITEM.VALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING

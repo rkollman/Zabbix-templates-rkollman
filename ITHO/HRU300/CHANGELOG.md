@@ -2,6 +2,11 @@
 
 Alle belangrijke wijzigingen aan dit project worden in dit bestand gedocumenteerd.
 
+## [7.0-1]
+
+### Changed
+- Changed operational data in triggers to {ITEM.VALUE} instead of {ITEM.LASTVALUE}
+
 ## [7.0-0] - 30-11-2025
 
 ### Added
