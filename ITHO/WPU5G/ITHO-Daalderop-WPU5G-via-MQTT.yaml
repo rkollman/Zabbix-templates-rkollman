@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-7
+        version: 7.0-8
       groups:
         - name: Kollman/ITHO
         - name: Templates/Applications
@@ -44,17 +44,6 @@ zabbix_export:
             - tag: ITHO
               value: boiler
           triggers:
-            - uuid: b2b3c99cf9504e94a0c76a5879f4c44f
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
-              name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
-              opdata: 'Current temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: AVERAGE
-              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPCOLD} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPCOLD} degrees Celsius it''s being triggered.'
-              tags:
-                - tag: scope
-                  value: availability
             - uuid: 0bae26c793b441a5b9ad1e2e95d75eb7
               expression: 'timeleft(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,10m,{$ITHO.TEMPCOLD})<300s'
               name: 'Boiler temperature down is going to be cold (< {$ITHO.TEMPCOLD}) in 5 minutes'
@@ -63,36 +52,6 @@ zabbix_export:
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING
               description: 'Trigger als de boiler onderin over 5 minuten koud is (gemeten over het verbruik van de afgelopen 10 minuten).'
-              tags:
-                - tag: scope
-                  value: performance
-            - uuid: ced77441952846999a4daa6980826918
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPLOW}'
-              name: 'Boiler temperature down is low (< {$ITHO.TEMPLOW})'
-              opdata: 'Current down sensor temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: INFO
-              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPLOW} degrees Celsius it''s being triggered'
-              dependencies:
-                - name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
-                - name: 'Boiler temperature down is very low (< {$ITHO.TEMPVERYLOW})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW}'
-              tags:
-                - tag: scope
-                  value: performance
-            - uuid: d60dbb5d0e5446839ea3e354a2f42038
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW}'
-              name: 'Boiler temperature down is very low (< {$ITHO.TEMPVERYLOW})'
-              opdata: 'Current temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: WARNING
-              description: 'Informational message when the water temperature on the lower part of the boiler is below {$ITHO.TEMPVERYLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPVERYLOW} degrees Celsius it''s being triggered.'
-              dependencies:
-                - name: 'Boiler temperature down is cold (< {$ITHO.TEMPCOLD})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD}'
               tags:
                 - tag: scope
                   value: performance
@@ -118,17 +77,6 @@ zabbix_export:
             - tag: ITHO
               value: boiler
           triggers:
-            - uuid: 7c12e976ecfc47069678730f1396dfe7
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
-              name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
-              opdata: 'Current temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: AVERAGE
-              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPCOLD} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPCOLD} degrees Celsius it''s being triggered.'
-              tags:
-                - tag: scope
-                  value: availability
             - uuid: c9bbf913baf040ecbc289ecac449c9b3
               expression: 'timeleft(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,10m,{$ITHO.TEMPCOLD})<=300s'
               name: 'Boiler temperature up is going to be cold in 5 minutes (< {$ITHO.TEMPCOLD})'
@@ -137,36 +85,6 @@ zabbix_export:
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
               description: 'Gemeten over de laatste 10 minuten, is de voorspelling dat over 5 minuten het water in de boiler overal te koud is, niet meer douchen! :-).'
-              tags:
-                - tag: scope
-                  value: performance
-            - uuid: d0a5e05a78c24abfbbfd5de313a9b851
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPLOW}'
-              name: 'Boiler temperature up is low (< {$ITHO.TEMPLOW})'
-              opdata: 'Current temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: INFO
-              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPLOW} degrees Celsius it''s being triggered.'
-              dependencies:
-                - name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
-                - name: 'Boiler temperature up is very low (< {$ITHO.TEMPVERYLOW})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
-              tags:
-                - tag: scope
-                  value: performance
-            - uuid: 3ac815cb7ca74209b1eea3b91d823bd8
-              expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
-              name: 'Boiler temperature up is very low (< {$ITHO.TEMPVERYLOW})'
-              opdata: 'Current temperature: {ITEM.VALUE}'
-              url_name: 'Host dashboard'
-              url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
-              priority: WARNING
-              description: 'Informational message when the water temperature on the upper part of the boiler is below {$ITHO.TEMPVERYLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPVERYLOW} degrees Celsius it''s being triggered.'
-              dependencies:
-                - name: 'Boiler temperature up is cold (< {$ITHO.TEMPCOLD})'
-                  expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
               tags:
                 - tag: scope
                   value: performance
@@ -414,10 +332,6 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           trends: '0'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 300s
           tags:
             - tag: component
               value: ITHO
@@ -451,7 +365,7 @@ zabbix_export:
           description: 'Your MQTT user'
         - macro: '{$ITHO.TEMPCOLD}'
           value: '20'
-          description: 'Temperature level when water temperature is cold'
+          description: 'Temperature level when water temperature is cold/critically low'
         - macro: '{$ITHO.TEMPLOW}'
           value: '30'
           description: 'Temperature level when water temperature is low'
@@ -682,6 +596,51 @@ zabbix_export:
           mappings:
             - value: kWh
               newvalue: MWh
+  triggers:
+    - uuid: 274e3ad65d91451597b064573a04e9fa
+      expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+      name: 'Boiler temperature is cold'
+      event_name: 'Boiler temperature is cold (< {$ITHO.TEMPCOLD})'
+      opdata: 'Sensors: Down: {ITEM.VALUE1} Up: {ITEM.VALUE2}'
+      url_name: 'Host dashboard'
+      url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+      priority: AVERAGE
+      description: 'Average severity message when the water temperature on the lower and upper part of the boiler is below {$ITHO.TEMPCOLD} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPCOLD} degrees Celsius it''s being triggered.'
+      tags:
+        - tag: scope
+          value: availability
+    - uuid: 737565545cc64924960afb92592b46fe
+      expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPLOW} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPLOW}'
+      name: 'Boiler temperature is low'
+      event_name: 'Boiler temperature is low (< {$ITHO.TEMPLOW})'
+      opdata: 'Sensors: Down: {ITEM.VALUE1} Up: {ITEM.VALUE2}'
+      url_name: 'Host dashboard'
+      url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+      priority: INFO
+      description: 'Informational message when the water temperature on the lower and upper part of the boiler is below {$ITHO.TEMPLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPLOW} degrees Celsius it''s being triggered'
+      dependencies:
+        - name: 'Boiler temperature is cold'
+          expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+        - name: 'Boiler temperature is very low'
+          expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
+      tags:
+        - tag: scope
+          value: performance
+    - uuid: e92195076016463fb6b2a856b9f6c497
+      expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPVERYLOW} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPVERYLOW}'
+      name: 'Boiler temperature is very low'
+      event_name: 'Boiler temperature is very low (< {$ITHO.TEMPVERYLOW})'
+      opdata: 'Sensors: Down: {ITEM.VALUE1} Up: {ITEM.VALUE2}'
+      url_name: 'Host dashboard'
+      url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+      priority: WARNING
+      description: 'Warning message when the water temperature on the lower and upper part of the boiler is below {$ITHO.TEMPVERYLOW} degrees Celsius. When this is measured 3 times and is below {$ITHO.TEMPVERYLOW} degrees Celsius it''s being triggered.'
+      dependencies:
+        - name: 'Boiler temperature is cold'
+          expression: 'last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempdown,#3)<{$ITHO.TEMPCOLD} and last(/ITHO WPU5G Daalderop by MQTT/itho.boilertempup,#3)<{$ITHO.TEMPCOLD}'
+      tags:
+        - tag: scope
+          value: performance
   graphs:
     - uuid: 16ece1708304436da08c8365218f37d1
       name: 'Boiler temperature'
