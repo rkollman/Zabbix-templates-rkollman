@@ -2,11 +2,15 @@
 
 Alle belangrijke wijzigingen aan dit project worden in dit bestand gedocumenteerd.
 
+## [7.0-8]
+
+### Changed
+- Changed the sensor triggers to combine both upper and lower sensors in boiler. When both drop below the set threshold, a trigger will fire.
 
 ## [7.0-7]
 
 ### Changed
-- Changed operational data in triggers to {ITEM.VALUE} instead of {ITEM.LASTVALUE}
+- Changed operational data in triggers to {ITEM.VALUE} instead of {ITEM.LASTVALUE}.
 
 ## [7.0-6]
 
