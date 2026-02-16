@@ -15,8 +15,9 @@ zabbix_export:
         Added SNMP walk and get on items to use the asynchronous SNMP poller (works on SNMPv1 not v2!). Deleted calculated items for percentage used as the SNMP OIDs will deliver this values.
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-2
+        version: 7.0-3
       groups:
+        - name: Kollman
         - name: Templates/Applications
       items:
         - uuid: c5359c23efee4413a2bb86a44462688f
@@ -33,8 +34,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 7d2551b7b42f4d1caf6ac4d6a39ac08e
           name: 'Current cartridge toner level - black'
           type: DEPENDENT
@@ -50,8 +51,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: fb98554555ec4177b318c22b171e44ae
           name: 'Max cartridge toner level - cyan'
           type: DEPENDENT
@@ -66,8 +67,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 43eec465389043df85248714aa89b6ea
           name: 'Current cartridge toner level - cyan'
           type: DEPENDENT
@@ -83,8 +84,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 4ecc9671ef0b47809ae04927d8571670
           name: 'Max cartridge toner level - magenta'
           type: DEPENDENT
@@ -99,8 +100,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 79827cc341ce4410bcd4141b18d1d318
           name: 'Current cartridge toner level - magenta'
           type: DEPENDENT
@@ -116,13 +117,14 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 3c268b4517794db291fc900470eb1dd8
           name: 'Walk toner info'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.43.11.1.1.6.1,1.3.6.1.2.1.43.11.1.1.8.1,1.3.6.1.2.1.43.11.1.1.9.1]'
           key: ink.raw
+          delay: 15m
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -144,8 +146,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: b596c83ca87b443291d195ea57c2c500
           name: 'Current cartridge toner level - yellow'
           type: DEPENDENT
@@ -161,8 +163,8 @@ zabbix_export:
           master_item:
             key: ink.raw
           tags:
-            - tag: Application
-              value: 'Consumables level'
+            - tag: application
+              value: 'consumables level'
         - uuid: 4305673d03e546e1bdf3e532bc181fed
           name: 'Printer model'
           type: SNMP_AGENT
@@ -174,32 +176,37 @@ zabbix_export:
           trends: '0'
           inventory_link: TYPE
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: 0954b1343a1c4a13a6ede5a4fe4fceca
           name: 'Pages printed - total'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.2.1.43.10.2.1.4.1.1]'
           key: pages.printed.total
-          delay: 5m
+          delay: 15m
           history: 7d
           value_type: FLOAT
+          units: '!pages'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
           tags:
-            - tag: Application
-              value: 'Pages printed'
+            - tag: application
+              value: 'pages printed'
         - uuid: 36f8a44234cf404db2f6f1de0515e9d5
           name: 'Printer location'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.2.1.1.6.0]'
           key: printer.location
-          delay: 12h
+          delay: 1d
           history: 7d
           value_type: TEXT
           trends: '0'
           inventory_link: LOCATION
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: 49038496b9ad44f5a328720c9f8a7d84
           name: 'Serial number'
           type: SNMP_AGENT
@@ -210,8 +217,8 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: 10b841cf7d68495096a3522580b4e1c1
           name: 'Cartridge type - Black'
           type: SNMP_AGENT
@@ -222,8 +229,8 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: f52c98f104a946579f840d9925c69451
           name: 'Cartridge type - Cyan'
           type: SNMP_AGENT
@@ -234,8 +241,8 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: 40d772e7b30541b7a996662133fe5d7a
           name: 'Cartridge type - Magenta'
           type: SNMP_AGENT
@@ -246,8 +253,8 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
         - uuid: eac2aa495c1042c2842fab4ff0ce1167
           name: 'Cartridge type - Yellow'
           type: SNMP_AGENT
@@ -258,8 +265,8 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           tags:
-            - tag: Application
-              value: 'Printer information'
+            - tag: application
+              value: 'printer info'
       tags:
         - tag: component
           value: printer
@@ -380,6 +387,9 @@ zabbix_export:
           expression: |
             last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.black.now)=0
             and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.black,3w)=0
+      tags:
+        - tag: scope
+          value: performance
     - uuid: 8513d03ef6e040cf946024c4de6aeec5
       expression: |
         last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.cyan.now)<20
@@ -391,6 +401,9 @@ zabbix_export:
           expression: |
             last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.cyan.now)=0
             and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.cyan,3w)=0
+      tags:
+        - tag: scope
+          value: performance
     - uuid: da534822d67e4fe788cd3df5c12dec1b
       expression: |
         last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.magenta.now)<20
@@ -402,6 +415,9 @@ zabbix_export:
           expression: |
             last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.magenta.now)=0
             and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.magenta,3w)=0
+      tags:
+        - tag: scope
+          value: performance
     - uuid: d348ca69dc534a34b9b0904ae91856df
       expression: |
         last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.yellow.now)<20
@@ -413,6 +429,9 @@ zabbix_export:
           expression: |
             last(/Printer HP Color LaserJet MFP 178 or 179fnw/ink.yellow.now)=0
             and nodata(/Printer HP Color LaserJet MFP 178 or 179fnw/type.yellow,3w)=0
+      tags:
+        - tag: scope
+          value: performance
   graphs:
     - uuid: 5c1f35e4d3fb4a589fc68cc3613dada8
       name: 'Black toner level'
