@@ -17,7 +17,7 @@ zabbix_export:
         Raimond Kollman
       vendor:
         name: 'Raimond Kollman'
-        version: 7.0-1
+        version: 7.0-2
       groups:
         - name: Kollman/ITHO
         - name: Templates/Applications
@@ -96,7 +96,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2measured,10m)<{$WARNINGPPM}-200'
               name: 'Average air quality last 10 minutes higher than {$WARNINGPPM} ppm'
-              opdata: 'Current air quality in ppm: {ITEM.VALUE}'
+              opdata: 'Air quality in ppm at problem: {ITEM.VALUE} currently: {ITEM.LASTVALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: AVERAGE
@@ -137,6 +137,8 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Error-state of the HRU system'
+          valuemap:
+            name: 'ITHO HRU Errors'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -157,7 +159,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.error-number,#5)=0'
               name: 'ITHO HRU has an error'
-              opdata: 'Current error: {ITEM.VALUE}'
+              opdata: 'Error number: {ITEM.VALUE} Current error: {ITEM.LASTVALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: HIGH
@@ -319,6 +321,62 @@ zabbix_export:
           tags:
             - tag: ITHO
               value: outside
+        - uuid: 32d6c651e24a44dda7e7422457dd94fb
+          name: 'Douche humidity'
+          type: DEPENDENT
+          key: ithohru.remote.douche.humidity
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.douche.hum
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: humidity
+            - tag: ITHO
+              value: remotes
+        - uuid: fe103987171d47b6b5bd1140422ce1c9
+          name: 'Battery douche remote percentage'
+          type: DEPENDENT
+          key: ithohru.remote.douche.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of battery of the remote'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.douche.battery
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: remotes
+        - uuid: 3ae6144209cc44f593247bcaed92b8a8
+          name: 'Douche temperature'
+          type: DEPENDENT
+          key: ithohru.remote.douche.temp
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.douche.temp
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          tags:
+            - tag: ITHO
+              value: remotes
+            - tag: ITHO
+              value: temperature
         - uuid: cdc745a820714ba9b6d8890391df78a2
           name: 'Relative humidity percentage'
           type: DEPENDENT
@@ -343,7 +401,8 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<78'
               name: 'Relative humidity average'
-              opdata: 'Current RH: {ITEM.VALUE}'
+              event_name: 'Humidity higher than 80%'
+              opdata: 'RH at start problem: {ITEM.VALUE} current RH: {ITEM.LASTVALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: INFO
@@ -361,7 +420,8 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.rhpercentage,10m)<81'
               name: 'Relative humidity high'
-              opdata: 'Current RH: {ITEM.VALUE}'
+              event_name: 'Humidity higher than 90%'
+              opdata: 'RH at start problem: {ITEM.VALUE} current RH: {ITEM.LASTVALUE}'
               url_name: 'Host dashboard'
               url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
               priority: WARNING
@@ -388,6 +448,23 @@ zabbix_export:
           tags:
             - tag: ITHO
               value: motor
+        - uuid: 1d43a1f115844b3193c4dcd7a68648a7
+          name: 'ITHO HRU Remotes Status topic'
+          type: ZABBIX_ACTIVE
+          key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          delay: '0'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 60s
+          tags:
+            - tag: component
+              value: ITHO
+            - tag: component
+              value: raw
         - uuid: 7f3475e59eef434eb8291d50f4d8e841
           name: 'ITHO HRU Status topic'
           type: ZABBIX_ACTIVE
@@ -399,12 +476,118 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 180s
+                - 60s
           tags:
             - tag: component
               value: ITHO
             - tag: component
               value: raw
+      discovery_rules:
+        - uuid: 9a8e56e0bc674b8295902eddf0b22091
+          name: 'ITHO HRU Remotes'
+          type: DEPENDENT
+          key: itho.hru.remotes.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: 55a99538a90d4da8b1186c38f15504e4
+              name: '{#KAMER}: CO2 waarde'
+              type: DEPENDENT
+              key: 'ithohru.co2.[{#KAMER}]'
+              delay: '0'
+              units: '!ppm'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.["{#KAMER}"].co2'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+              tags:
+                - tag: ITHO
+                  value: air
+                - tag: '{#KAMER}'
+              trigger_prototypes:
+                - uuid: 77bfca96d9a64a01ac9ed72044178b48
+                  expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)>{$HIGHPPM:"{#KAMER}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)<{$WARNINGPPM:"{#KAMER}"}'
+                  name: '[{#KAMER}]: Average air quality too high'
+                  event_name: '[{#KAMER}]: Average air quality last 10 minutes higher than {$HIGHPPM}:"{#KAMER}" ppm'
+                  opdata: 'Current AQ in ppm: {ITEM.LASTVALUE} Problem AQ in PPM: {ITEM.VALUE}'
+                  url_name: 'Host dashboard'
+                  url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+                  priority: HIGH
+                  description: 'Air quality is very poor quality, it''s time to really start ventilating. Maybe open some windows?'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: health
+                    - tag: scope
+                      value: performance
+                - uuid: b6c57206434741339da5b3dafcf55ae4
+                  expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)>{$WARNINGPPM:"{#KAMER}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)<{$WARNINGPPM:"{#KAMER}"}-200'
+                  name: '[{#KAMER}]: Average air quality warning level'
+                  event_name: '[{#KAMER}]: Average air quality last 10 minutes higher than {$WARNINGPPM}:"{#KAMER}" ppm'
+                  opdata: 'Current AQ in ppm: {ITEM.LASTVALUE} Problem AQ in PPM: {ITEM.VALUE}'
+                  url_name: 'Host dashboard'
+                  url: 'zabbix.php?action=host.dashboard.view&hostid={HOST.ID}'
+                  priority: AVERAGE
+                  description: 'Air quality is of average quality. Ventilate more!'
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: '[{#KAMER}]: Average air quality too high'
+                      expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)>{$HIGHPPM:"{#KAMER}"}'
+                      recovery_expression: 'avg(/ITHO HRU300 Duo Daalderop by MQTT/ithohru.co2.[{#KAMER}],10m)<{$WARNINGPPM:"{#KAMER}"}'
+                  tags:
+                    - tag: scope
+                      value: health
+                    - tag: scope
+                      value: performance
+            - uuid: c11196a88cc64a8d91a54dccccf77b95
+              name: '{#KAMER}: Temperatuur'
+              type: DEPENDENT
+              key: 'ithohru.temp.[{#KAMER}]'
+              delay: '0'
+              value_type: FLOAT
+              units: °C
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.["{#KAMER}"].temp'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+              tags:
+                - tag: ITHO
+                  value: temperature
+                - tag: '{#KAMER}'
+          master_item:
+            key: 'mqtt.get[{$ITHO.MQTTHOST}:{$ITHO.MQTTPORT},{$ITHOHRU.REMOTES.TOPIC},{$ITHO.MQTTUSER},{$ITHO.MQTTPASSWD}]'
+          lld_macro_paths:
+            - lld_macro: '{#CO2}'
+              path: '$.["{#KAMER}"].co2'
+            - lld_macro: '{#TEMP}'
+              path: '$.["{#KAMER}"].temp'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  var result = [];
+                  
+                  for (var room in data) {
+                      result.push({
+                          "{#KAMER}": room
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
       tags:
         - tag: application
           value: ITHO
@@ -416,6 +599,12 @@ zabbix_export:
         - macro: '{$HIGHPPM}'
           value: '2000'
           description: 'When ppm of air is higher than this, give high alert'
+        - macro: '{$HIGHPPM:"huiskamer"}'
+          value: '2200'
+          description: 'When ppm of air is higher than this in huiskamer, give high alert'
+        - macro: '{$HIGHPPM:"slaapkamer"}'
+          value: '1600'
+          description: 'When ppm of air is higher than this in slaapkamer, give high alert'
         - macro: '{$ITHO.MQTTHOST}'
           value: 'tcp://hostname'
           description: 'Fill in your MQTT hostname'
@@ -428,12 +617,21 @@ zabbix_export:
         - macro: '{$ITHO.MQTTUSER}'
           value: itho
           description: 'Your MQTT user'
+        - macro: '{$ITHOHRU.REMOTES.TOPIC}'
+          value: ithohru/remotesinfo
+          description: 'Topic to which the ITHO remotes status messages are sent'
         - macro: '{$ITHOHRU.TOPIC}'
           value: ithohru/ithostatus
           description: 'Topic to which the ITHO HRU status messages are sent'
         - macro: '{$WARNINGPPM}'
           value: '1200'
           description: 'When ppm of air is higher than this, give warning'
+        - macro: '{$WARNINGPPM:"huiskamer"}'
+          value: '1400'
+          description: 'When ppm of air is higher than this in huiskamer, give warning'
+        - macro: '{$WARNINGPPM:"slaapkamer"}'
+          value: '1000'
+          description: 'When ppm of air is higher than this in slaapkamer, give warning'
       dashboards:
         - uuid: cb3437165d2443c4a3b0adc5ee628f85
           name: 'ITHO HRU WTW unit'
@@ -544,6 +742,66 @@ zabbix_export:
                       name: righty_min
                       value: '250'
                     - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: 'Humidity % vs Fan %'
+                  'y': '10'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0080FF
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '2'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Relative humidity percentage'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color
+                      value: FF8000
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Fan percentage'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: VGJDW
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                    - type: INTEGER
                       name: simple_triggers
                       value: '1'
                     - type: INTEGER
@@ -591,6 +849,9 @@ zabbix_export:
                     - type: INTEGER
                       name: righty
                       value: '0'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
                     - type: INTEGER
                       name: working_time
                       value: '1'
@@ -640,6 +901,14 @@ zabbix_export:
                     - type: INTEGER
                       name: working_time
                       value: '1'
+      valuemaps:
+        - uuid: f748fdc3fd8845d2b6d4281af1ef641b
+          name: 'ITHO HRU Errors'
+          mappings:
+            - value: '0'
+              newvalue: Ok
+            - value: '2'
+              newvalue: 'Filter needs cleaning'
   graphs:
     - uuid: c898adcd596e42b2b73326fdc5c2039f
       name: 'Inlet and outlet temperature vs outside temperature'
@@ -664,3 +933,17 @@ zabbix_export:
           item:
             host: 'ITHO HRU300 Duo Daalderop by MQTT'
             key: ithohru.outsidetemp
+    - uuid: cfe666d9522f4adb89e917afb16a3037
+      name: 'Relative humidity'
+      graph_items:
+        - color: 0040FF
+          calc_fnc: ALL
+          item:
+            host: 'ITHO HRU300 Duo Daalderop by MQTT'
+            key: ithohru.rhpercentage
+        - sortorder: '1'
+          color: FF4000
+          calc_fnc: ALL
+          item:
+            host: 'ITHO HRU300 Duo Daalderop by MQTT'
+            key: ithohru.fanpercentage
